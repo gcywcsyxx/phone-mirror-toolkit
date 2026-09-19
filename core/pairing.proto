@@ -1,0 +1,18 @@
+syntax = "proto3";
+package adb.pairing;
+
+message PairingPacket {
+  oneof packet {
+    PairingInit init = 1;
+    PairingResult result = 2;
+  }
+}
+
+message PairingInit {
+  bytes pairing_code = 1;
+  bytes peer_info = 2;
+}
+
+message PairingResult {
+  bool success = 1;
+}

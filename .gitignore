@@ -1,0 +1,15 @@
+# generated at runtime
+pair-qr*.png
+pair-server.log
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+
+# editors / os
+.vs/
+.vscode/
+*.swp
+Thumbs.db
+desktop.ini
