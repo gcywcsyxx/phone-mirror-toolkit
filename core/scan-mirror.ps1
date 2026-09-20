@@ -7,6 +7,8 @@ $adb    = Join-Path $Tools 'bin\platform-tools\adb.exe'
 $srv    = Join-Path $Tools 'pair_server.py'
 $png    = Join-Path $Tools 'pair-qr.png'
 $mirror = Join-Path $Tools 'mirror.ps1'
+if (-not (Test-Path $adb)) { $adb = 'C:\Users\Jerry\Tools\platform-tools\adb.exe' }
+if (-not (Test-Path $srv)) { $srv = 'C:\Users\Jerry\Tools\pair_server.py' }
 
 function Say($m,$c='Gray'){ Write-Host $m -ForegroundColor $c }
 
@@ -14,6 +16,9 @@ $py = $null
 foreach ($c in @('python','py')) {
     $g = Get-Command $c -EA SilentlyContinue
     if ($g) { $py = $g.Source; break }
+}
+if (-not $py -and (Test-Path 'C:\Users\Jerry\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe')) {
+    $py = 'C:\Users\Jerry\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe'
 }
 if (-not $py) { Say 'Python not found. Install it, then rerun.' Red; Read-Host 'Enter'; exit 1 }
 
@@ -52,8 +57,22 @@ if (-not $ready) {
 }
 
 if (Test-Path $png) {
-    Start-Process -FilePath $png
-    Say '  QR opened. Scan it now.' Green
+    $opened = $false
+    try {
+        Start-Process -FilePath $png -ErrorAction Stop
+        $opened = $true
+    } catch {
+        try {
+            & cmd.exe /c start '' $png 2>&1 | Out-Null
+            $opened = $true
+        } catch { $opened = $false }
+    }
+    if ($opened) {
+        Say '  QR opened. Scan it now.' Green
+    } else {
+        Say '  Could not open the QR automatically.' Yellow
+        Say ('  Open this file yourself, then scan it:  ' + $png) White
+    }
 } else {
     Say 'QR image missing' Red
     Stop-Job $job -EA SilentlyContinue; Remove-Job $job -Force -EA SilentlyContinue
