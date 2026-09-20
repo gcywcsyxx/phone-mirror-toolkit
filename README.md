@@ -159,8 +159,11 @@ client: TLS_OK cipher=TLS_AES_256_GCM_SHA384
 - **Two ADB daemons race on port 5037.** scrcpy ships its own `adb.exe`; set
   `$env:ADB` to the platform-tools one before launching, or connections fail
   intermittently.
-- **Duplicate transports break scrcpy** with `more than one device/emulator`.
-  Disconnect the redundant one first.
+- **Multiple connected devices.** scrcpy refuses to run when more than one
+  device or transport is visible (`more than one device/emulator`). `mirror.ps1`
+  now lists them and asks which one to use; pass `-Serial <id>` to skip the prompt.
+  Note USB devices cannot be `adb disconnect`ed, so de-duplication only works for
+  wireless transports.
 - **A PowerShell array built from a pipeline can collapse to a scalar** -- a
   device name like `adb-XXXX._adb-tls-connect._tcp` silently becomes its first
   character. Build it with `ArrayList` and return `,$arr.ToArray()`.
